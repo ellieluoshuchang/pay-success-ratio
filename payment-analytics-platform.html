@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>支付商业分析平台</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f7f8fa;
+  --sidebar-bg: #1a1f2e;
+  --card-bg: #ffffff;
+  --primary: #4f6ef7;
+  --primary-light: #eef1ff;
+  --success: #34c759;
+  --warning: #ff9500;
+  --danger: #ff3b30;
+  --text-primary: #1d2129;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --number-color: #1d2129;
+  --radius: 12px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo h1 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.sidebar-logo span {
+  color: var(--primary);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+}
+
+.nav-section {
+  padding: 16px 20px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.9);
+}
+
+.nav-item.active {
+  background: rgba(79, 110, 247, 0.1);
+  color: #fff;
+  border-left-color: var(--primary);
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  opacity: 0.7;
+}
+
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-user {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.user-info { flex: 1; }
+.user-info .name { color: #fff; font-size: 13px; font-weight: 500; }
+.user-info .role { color: rgba(255,255,255,0.4); font-size: 11px; }
+
+/* Main Content */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Top Bar */
+.topbar {
+  height: 60px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.topbar-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.topbar-tab {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.topbar-tab:hover { background: var(--bg); }
+.topbar-tab.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+}
+
+.profile-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.profile-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.profile-config {
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--primary);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.monitor-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.monitor-tag {
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.insight-card {
+  background: linear-gradient(135deg, rgba(79,110,247,0.08), rgba(168,85,247,0.06));
+  border: 1px solid rgba(79,110,247,0.16);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 24px;
+}
+
+.insight-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.insight-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.insight-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.primary-action, .secondary-action {
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-action {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.secondary-action {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-secondary);
+}
+
+.push-list {
+  display: grid;
+  gap: 12px;
+}
+
+.push-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.push-item:last-child { border-bottom: none; }
+
+.push-type {
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 3px 7px;
+}
+
+.push-type.internal { background: rgba(52,199,89,0.1); color: var(--success); }
+.push-type.external { background: rgba(255,149,0,0.1); color: var(--warning); }
+
+.push-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.push-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+.push-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+.topbar-search {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 8px 14px;
+  gap: 8px;
+  width: 320px;
+}
+
+.topbar-search svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.topbar-search input {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.topbar-search input::placeholder { color: var(--text-muted); }
+
+/* Content */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+
+.content-header {
+  margin-bottom: 24px;
+}
+
+.content-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+.content-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Metric Cards */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s;
+}
+
+.metric-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.metric-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--number-color);
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.metric-value .unit {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+.metric-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.metric-change.up { color: var(--success); background: rgba(52,199,89,0.08); }
+.metric-change.down { color: var(--danger); background: rgba(255,59,48,0.08); }
+.metric-change.neutral { color: var(--warning); background: rgba(255,149,0,0.08); }
+
+/* Charts Area */
+.charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border);
+}
+
+.chart-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chart-card-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.chart-filter {
+  display: flex;
+  gap: 4px;
+}
+
+.chart-filter-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.chart-filter-btn.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* SVG Chart */
+.chart-area {
+  width: 100%;
+  height: 200px;
+  position: relative;
+}
+
+.chart-area svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Analysis Table */
+.table-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+}
+
+.table-card-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.table-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge-live { background: rgba(52,199,89,0.1); color: var(--success); }
+.badge-warning { background: rgba(255,149,0,0.1); color: var(--warning); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 10px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 14px 24px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td { border-bottom: none; }
+
+td.number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.status-dot.green { background: var(--success); }
+.status-dot.yellow { background: var(--warning); }
+.status-dot.red { background: var(--danger); }
+
+/* AI Chat Panel */
+.ai-panel {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.ai-panel-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-icon svg { width: 16px; height: 16px; color: #fff; }
+
+.ai-panel-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ai-panel-header span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ai-chat-body {
+  padding: 20px 24px;
+}
+
+.ai-message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ai-message-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--primary), #a855f7);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ai-message-content {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  max-width: 80%;
+}
+
+.ai-message-content strong { font-weight: 600; }
+
+.ai-input-area {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+.ai-input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ai-input:focus { border-color: var(--primary); }
+
+.ai-send-btn {
+  padding: 10px 18px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.ai-send-btn:hover { opacity: 0.85; }
+
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.quick-action-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-action-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(79,110,247,0.08);
+}
+
+.quick-action-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.quick-action-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.quick-action-card p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Industry Research Section */
+.research-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.research-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+}
+
+.research-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.research-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.research-item:last-child { border-bottom: none; }
+
+.research-item-title {
+  font-size: 13px;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.research-item-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tag-hot { background: rgba(255,59,48,0.08); color: var(--danger); }
+.tag-new { background: rgba(79,110,247,0.08); color: var(--primary); }
+.tag-trend { background: rgba(52,199,89,0.08); color: var(--success); }
+
+/* Tabs for pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Role switcher */
+.role-switcher {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.role-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  transition: all 0.15s;
+}
+
+.role-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+
+.sidebar-subnav { margin: 4px 0 14px; }
+.sidebar-subnav .nav-item { padding-left: 42px; font-size: 13px; height: 34px; }
+.sidebar-subnav .nav-item svg { width: 14px; height: 14px; }
+.workspace-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 24px; }
+.panel-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+.panel-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+.prompt-box { border: 1px solid var(--border); border-radius: 12px; background: var(--bg); padding: 16px; margin-bottom: 16px; }
+.prompt-box textarea { width: 100%; min-height: 96px; border: none; outline: none; resize: vertical; background: transparent; font-size: 14px; color: var(--text-primary); line-height: 1.6; }
+.prompt-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; }
+.memory-strip { display:flex; flex-wrap:wrap; gap:8px; }
+.memory-chip { padding:6px 10px; border-radius:999px; background:var(--primary-light); color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; }
+.agent-grid, .opportunity-grid, .knowledge-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+.agent-card, .opportunity-card, .knowledge-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+.agent-card h4, .opportunity-card h4, .knowledge-card h4 { font-size:14px; font-weight:700; margin-bottom:8px; }
+.agent-card p, .opportunity-card p, .knowledge-card p { font-size:12px; color:var(--text-secondary); line-height:1.6; }
+.card-meta { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.meta-tag { font-size:11px; font-weight:700; border-radius:4px; padding:3px 7px; background:var(--primary-light); color:var(--primary); }
+.meta-tag.green { background:rgba(52,199,89,0.1); color:var(--success); }
+.meta-tag.orange { background:rgba(255,149,0,0.1); color:var(--warning); }
+.report-list { display:grid; gap:10px; }
+.report-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.report-item:last-child { border-bottom:none; }
+.report-main { font-size:13px; font-weight:700; }
+.report-sub { font-size:12px; color:var(--text-secondary); margin-top:4px; }
+.framework-flow { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:14px; }
+.flow-step { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px; font-size:12px; line-height:1.5; }
+.flow-step strong { display:block; font-size:13px; margin-bottom:4px; color:var(--text-primary); }
+@media (max-width: 1200px) { .agent-grid, .opportunity-grid, .knowledge-grid { grid-template-columns:1fr; } .framework-flow { grid-template-columns:1fr; } }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+}
+
+/* UI/UX Pro Max refinement: financial SaaS bento dashboard */
+:root {
+  --bg: #f4f7fb;
+  --bg-elevated: rgba(255,255,255,0.74);
+  --sidebar-bg: #0c1222;
+  --card-bg: rgba(255,255,255,0.88);
+  --primary: #2457f5;
+  --primary-strong: #153ed6;
+  --primary-light: #edf3ff;
+  --primary-soft: rgba(36,87,245,0.1);
+  --success: #13b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --text-primary: #111827;
+  --text-secondary: #667085;
+  --text-muted: #98a2b3;
+  --border: rgba(17,24,39,0.08);
+  --border-strong: rgba(36,87,245,0.16);
+  --number-color: #0f172a;
+  --radius: 18px;
+  --shadow-sm: 0 6px 18px rgba(15,23,42,0.05);
+  --shadow-md: 0 18px 45px rgba(15,23,42,0.1);
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% 8%, rgba(36,87,245,0.12), transparent 32%),
+    radial-gradient(circle at 78% 0%, rgba(19,185,129,0.1), transparent 28%),
+    linear-gradient(135deg, #f8fbff 0%, var(--bg) 52%, #eef4ff 100%);
+}
+
+.sidebar {
+  width: 252px;
+  background: linear-gradient(180deg, rgba(19,30,56,0.98), rgba(8,13,28,0.98)), var(--sidebar-bg);
+  box-shadow: 18px 0 40px rgba(15,23,42,0.18);
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar-logo { padding: 26px 22px 22px; border-bottom-color: rgba(255,255,255,0.08); }
+.sidebar-logo h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.45px; }
+.sidebar-logo span { color: #78a6ff; }
+.nav-section { padding: 18px 22px 8px; font-weight: 800; color: rgba(255,255,255,0.42); letter-spacing: 0.8px; }
+.nav-item { margin: 2px 12px; padding: 10px 12px; border-left: none; border-radius: 12px; transition: all 0.2s ease; }
+.nav-item:hover { background: rgba(255,255,255,0.08); transform: translateX(2px); }
+.nav-item.active { background: linear-gradient(135deg, rgba(70,118,255,0.28), rgba(19,185,129,0.12)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 10px 22px rgba(36,87,245,0.16); }
+.sidebar-subnav .nav-item { margin-left: 18px; padding-left: 18px; }
+.user-avatar { width: 38px; height: 38px; border-radius: 14px; background: linear-gradient(135deg, #3b82f6, #13b981); }
+
+.topbar {
+  height: 72px;
+  background: rgba(255,255,255,0.76);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255,255,255,0.72);
+}
+.profile-title { font-size: 15px; font-weight: 800; }
+.profile-config { border-color: var(--border-strong); background: linear-gradient(180deg, #fff, #f7faff); border-radius: 999px; padding: 8px 13px; transition: all 0.2s ease; }
+.profile-config:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.topbar-search { background: rgba(244,247,251,0.92); border: 1px solid rgba(15,23,42,0.06); border-radius: 999px; padding: 10px 15px; width: 390px; }
+
+.content { padding: 30px 34px 42px; }
+.content-header {
+  margin-bottom: 24px;
+  padding: 24px 26px;
+  border: 1px solid rgba(255,255,255,0.72);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(239,246,255,0.82)), var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+.content-header h2 { font-size: 26px; font-weight: 850; }
+.content-header p { margin-top: 6px; }
+.monitor-tag { padding: 6px 11px; background: rgba(36,87,245,0.08); border: 1px solid rgba(36,87,245,0.12); }
+
+.metric-card, .chart-card, .table-card, .workspace-panel, .agent-card, .opportunity-card, .knowledge-card {
+  background: var(--card-bg);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(16px);
+}
+.metric-card, .chart-card, .workspace-panel, .agent-card, .opportunity-card, .knowledge-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+.metric-card:hover, .chart-card:hover, .workspace-panel:hover, .agent-card:hover, .opportunity-card:hover, .knowledge-card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+.metric-card { padding: 22px 24px; }
+.metric-label { font-weight: 700; }
+.metric-value { font-size: 34px; font-weight: 850; }
+.metric-change, .table-badge, .meta-tag, .push-type { border-radius: 999px; }
+.metric-change { padding: 4px 9px; }
+
+.chart-card-header h3, .table-card-header h3, .panel-title { font-size: 16px; font-weight: 800; }
+.chart-filter-btn { padding: 6px 11px; border-radius: 999px; transition: all 0.2s ease; }
+.chart-filter-btn:hover { background: rgba(36,87,245,0.08); color: var(--primary); }
+.chart-filter-btn.active { background: var(--primary); color: #fff; }
+
+.insight-card {
+  background: linear-gradient(135deg, rgba(36,87,245,0.12), rgba(19,185,129,0.08)), rgba(255,255,255,0.86);
+  border: 1px solid rgba(36,87,245,0.18);
+  box-shadow: var(--shadow-sm);
+}
+.primary-action, .secondary-action { border-radius: 10px; padding: 9px 14px; transition: all 0.2s ease; }
+.primary-action { border-color: var(--primary-strong); background: linear-gradient(135deg, var(--primary), var(--primary-strong)); box-shadow: 0 10px 22px rgba(36,87,245,0.18); }
+.secondary-action { background: rgba(255,255,255,0.86); }
+.primary-action:hover, .secondary-action:hover { transform: translateY(-1px); }
+
+.prompt-box { background: rgba(244,247,251,0.74); border-color: rgba(36,87,245,0.12); }
+.memory-chip { border: 1px solid rgba(36,87,245,0.12); transition: all 0.2s ease; }
+.memory-chip:hover { transform: translateY(-1px); background: #fff; box-shadow: var(--shadow-sm); }
+.flow-step { background: rgba(244,247,251,0.82); border-color: rgba(36,87,245,0.1); }
+tbody tr { transition: background 0.15s ease; }
+tbody tr:hover { background: rgba(36,87,245,0.035); }
+::-webkit-scrollbar-thumb { background: rgba(36,87,245,0.28); }
+
+
+/* Navigation collapse and experiment form refinements */
+.nav-section.collapsible, .nav-section.solo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 12px;
+  margin: 10px 12px 4px;
+  padding: 12px 12px;
+  color: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.035);
+}
+
+.nav-section.solo { margin-bottom: 8px; }
+.nav-section.collapsible:hover, .nav-section.solo:hover, .nav-section.active { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-section .chevron { font-size: 14px; transition: transform 0.18s ease; opacity: 0.75; }
+.nav-section.collapsed .chevron { transform: rotate(-90deg); }
+.sidebar-subnav.collapsed { display: none; }
+.workbench-entry { display: none; }
+
+.prompt-box textarea { font-family: inherit; }
+.agent-card h4::before, .opportunity-card h4::before, .knowledge-card h4::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  margin-right: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--success));
+  vertical-align: 1px;
+}
+
+
+
+/* Intelligence matrix */
+.intel-matrix {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 12px;
+}
+.matrix-cell {
+  min-height: 132px;
+  border-radius: 16px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.72);
+  box-shadow: var(--shadow-sm);
+}
+.matrix-cell strong { display: block; font-size: 13px; line-height: 1.45; margin-bottom: 10px; color: var(--text-primary); }
+.matrix-cell span { display: block; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+.matrix-cell.high { background: linear-gradient(135deg, rgba(239,68,68,0.11), rgba(245,158,11,0.1)); border-color: rgba(239,68,68,0.18); }
+.matrix-cell.mid { background: linear-gradient(135deg, rgba(36,87,245,0.1), rgba(19,185,129,0.08)); border-color: rgba(36,87,245,0.16); }
+.matrix-cell.low { background: rgba(244,247,251,0.82); }
+.card-meta a.meta-tag { text-decoration: none; }
+@media (max-width: 1200px) { .intel-matrix { grid-template-columns: 1fr; } }
+
+
+
+/* Brand and role model */
+.logo-subtitle { margin-top: 5px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.56); letter-spacing: 0.08em; }
+.role-model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 18px; }
+.role-model-card { background: rgba(255,255,255,0.72); border: 1px solid rgba(36,87,245,0.12); border-radius: 16px; padding: 14px 16px; }
+.role-model-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.role-model-card p { font-size: 12px; line-height: 1.65; color: var(--text-secondary); }
+@media (max-width: 1200px) { .role-model-grid { grid-template-columns: 1fr; } }
+
+
+.personalization-entry { display:none; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1><span>Pay</span>Insight</h1>
+    <div class="logo-subtitle">支付数字人管家</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section solo" onclick="switchPage('overview')" data-menu="workbench">工作台</div>
+    <div class="nav-item active workbench-entry" onclick="switchPage('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      工作台
+    </div>
+
+    <div class="nav-section collapsible" onclick="toggleMenu('strategy-analysis')" data-menu="strategy-analysis">策略分析 <span class="chevron">⌄</span></div>
+    <div class="sidebar-subnav" data-subnav="strategy-analysis">
+      <div class="nav-item" onclick="switchPage('special-analysis')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+        专项分析
+      </div>
+      <div class="nav-item" onclick="switchPage('analysis')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        诊断分析
+      </div>
+    </div>
+
+    <div class="nav-section collapsible" onclick="toggleMenu('industry-insight')" data-menu="industry-insight">行业洞察 <span class="chevron">⌄</span></div>
+    <div class="sidebar-subnav" data-subnav="industry-insight">
+      <div class="nav-item" onclick="switchPage('opportunity-inspection')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        商机巡检
+      </div>
+      <div class="nav-item" onclick="switchPage('opportunity-analysis')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        商机分析
+      </div>
+    </div>
+
+    <div class="nav-section collapsible" onclick="toggleMenu('strategy-experiment')" data-menu="strategy-experiment">策略实验 <span class="chevron">⌄</span></div>
+    <div class="sidebar-subnav" data-subnav="strategy-experiment">
+      <div class="nav-item" onclick="switchPage('strategy-publish')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+        策略发布
+      </div>
+      <div class="nav-item" onclick="switchPage('strategy-monitor')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="6" width="3" height="11"/><rect x="17" y="13" width="3" height="4"/></svg>
+        策略监控
+      </div>
+      <div class="nav-item" onclick="switchPage('strategy-tool')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        策略工具
+      </div>
+    </div>
+
+    <div class="nav-section collapsible" onclick="toggleMenu('analysis-tools')" data-menu="analysis-tools">分析工具 <span class="chevron">⌄</span></div>
+    <div class="sidebar-subnav" data-subnav="analysis-tools">
+      <div class="nav-item" onclick="switchPage('framework')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        分析框架
+      </div>
+      <div class="nav-item" onclick="switchPage('analysis-agent')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M16 11a4 4 0 0 1-8 0"/><path d="M12 16v6"/><path d="M8 22h8"/></svg>
+        分析agent
+      </div>
+      <div class="nav-item" onclick="switchPage('metrics-setting')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V10"/><path d="M12 21V3"/><path d="M20 21v-7"/><path d="M2 10h4"/><path d="M10 3h4"/><path d="M18 14h4"/></svg>
+        指标设置
+      </div>
+      <div class="nav-item" onclick="switchPage('knowledge')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        知识库
+      </div>
+      <div class="nav-item" onclick="switchPage('skills')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Skill
+      </div>
+    </div>
+
+    <div class="nav-section solo" onclick="switchPage('personal-config')" data-menu="personal-config">个性化配置</div>
+    <div class="nav-item personalization-entry" onclick="switchPage('personal-config')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+      个性化配置
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">张</div>
+    <div class="user-info">
+      <div class="name">张瑛</div>
+      <div class="role">支付成功率产品经理</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-profile">
+      <div>
+        <div class="profile-label">我的工作台</div>
+        <div class="profile-title">产品张瑛 · 支付成功率监测</div>
+      </div>
+    </div>
+    <div class="topbar-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="输入分析诉求，如：分析大额交易成功率下降原因">
+    </div>
+  </header>
+
+  <!-- Content Area -->
+  <div class="content">
+
+    <!-- Page: Overview -->
+    <div class="page active" id="page-overview">
+      <div class="content-header">
+        <h2>产品经理张瑛的支付成功率工作台</h2>
+        <p>围绕支付成功率的日常监测、异常归因、策略实验和情报提醒持续追踪 · 数据更新至 2026-08-12 10:00</p>
+        <div class="monitor-tags"><span class="monitor-tag">收银台成功率</span><span class="monitor-tag">银行卡支付成功率</span><span class="monitor-tag">京东支付成功率</span><span class="monitor-tag">大额交易成功率</span><span class="monitor-tag">成功率需求上线效果</span></div>
+        <div class="role-model-grid"><div class="role-model-card"><h4>平台使用者</h4><p>拥有平台全部功能的使用权限，可进行工作台监控、策略分析、行业洞察、策略实验和分析工具调用。</p><div class="card-meta"><span class="meta-tag green">使用权限</span><span class="meta-tag">产品 / 运营 / 商务 / 分析师</span></div></div><div class="role-model-card"><h4>平台维护者</h4><p>分析师维护基础数据工具、Skill、分析框架；产品和运营维护知识库与业务策略口径。</p><div class="card-meta"><span class="meta-tag orange">维护权限</span><span class="meta-tag">分析师 / 产品 / 运营</span></div></div></div>
+      </div>
+      <div class="metrics-grid"><div class="metric-card"><div class="metric-label">收银台成功率 <span>今日</span></div><div class="metric-value">99.72<span class="unit">%</span></div><div class="metric-change up">同比 +0.15pp · 环比 +0.04pp</div></div><div class="metric-card"><div class="metric-label">银行卡支付成功率 <span>今日</span></div><div class="metric-value">99.41<span class="unit">%</span></div><div class="metric-change up">同比 +0.22pp · 环比 +0.06pp</div></div><div class="metric-card"><div class="metric-label">京东支付成功率 <span>今日</span></div><div class="metric-value">99.86<span class="unit">%</span></div><div class="metric-change up">同比 +0.09pp · 环比 +0.03pp</div></div><div class="metric-card"><div class="metric-label">大额交易成功率 <span>异常</span></div><div class="metric-value">96.8<span class="unit">%</span></div><div class="metric-change down">较基准 -2.3pp</div></div></div>
+      <div class="charts-row"><div class="chart-card"><div class="chart-card-header"><h3>重要信息提醒</h3><span class="table-badge badge-warning">今日必看</span></div><div class="report-list"><div class="report-item"><div><div class="report-main">进行中：90天3次失败卡片降权策略</div><div class="report-sub">发布人：产品张瑛 · 历山 20% 切量 · 当前支付成功率 +0.21pp</div></div><button class="secondary-action" onclick="switchPage('strategy-monitor')">看实验</button></div><div class="report-item"><div><div class="report-main">已出结果：银行卡推荐位 AB 实验</div><div class="report-sub">实验结论：高失败卡片降权后，收银台成功率 +0.16pp</div></div><button class="secondary-action" onclick="switchPage('special-analysis')">复用报告</button></div></div></div><div class="chart-card"><div class="chart-card-header"><h3>与我高度相关的情报</h3><span class="table-badge badge-live">相关度 ≥ 90</span></div><div class="push-list"><div class="push-item"><span class="push-type external">A 级</span><div><div class="push-title">银联建议强化失败重试与替代支付引导</div><div class="push-desc">相关角色：产品 / 分析师 · 影响银行卡成功率与收银台失败后链路。</div></div><span class="push-time">96分</span></div><div class="push-item"><span class="push-type external">B 级</span><div><div class="push-title">支付宝 AI 大会披露智能支付路由能力</div><div class="push-desc">可对标收银台推荐与失败后挽回策略。</div></div><span class="push-time">88分</span></div></div></div></div>
+      <div class="insight-card"><h3>异常报告及归因分析：大额交易成功率显著下降</h3><p><strong>监测发现：</strong>09:45 起大额交易成功率从常态基准 99.1% 降至 96.8%，偏差 -2.3pp。</p><p><strong>初步归因：</strong>异常主要集中在银行卡通道 A、金额 1000 元以上订单与商户 D 重试请求。</p><div class="insight-actions"><button class="primary-action" onclick="switchPage('analysis')">进入详细诊断</button><button class="secondary-action">订阅后续变化</button></div></div>
+    </div>
+
+    <!-- Page: Special Analysis -->
+    <div class="page" id="page-special-analysis">
+      <div class="content-header">
+        <h2>专项分析</h2>
+        <p>查看关注的分析结论，或快速发起一个临时分析；长期关注的问题可进入分析专项查看人员、策略、指标、报告和阈值设置。</p>
+      </div>
+
+      <div class="charts-row">
+        <div class="workspace-panel">
+          <div class="panel-title">发起分析</div>
+          <div class="panel-desc">输入你想分析的问题，并快捷选择本次分析要使用的知识库、指标体系、Skill 和 Agent。</div>
+          <div class="prompt-box">
+            <textarea placeholder="例如：分析收银台失败提示改版上线后，对银行卡支付成功率、新客成单率、用户改选率的影响。"></textarea>
+            <div class="memory-strip" style="margin-top:12px;"><span class="memory-chip">知识库：银行卡知识库</span><span class="memory-chip">知识库：策略复盘知识库</span><span class="memory-chip">指标体系：支付成功率指标</span><span class="memory-chip">Skill：归因分析</span><span class="memory-chip">Skill：AB 实验评估</span><span class="memory-chip">Agent：支付成功率 Agent</span></div>
+            <div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">需求上线影响</span><span class="memory-chip">活动复盘</span><span class="memory-chip">策略效果分析</span></div><button class="primary-action">开始分析</button></div>
+          </div>
+          <div class="report-list">
+            <div class="report-item"><div><div class="report-main">收银台失败提示改版上线影响</div><div class="report-sub">最近生成 · 输出成功率、改选率、客诉变化</div></div><button class="secondary-action">查看</button></div>
+            <div class="report-item"><div><div class="report-main">818 活动银行卡支付表现复盘</div><div class="report-sub">可复用分析思路 · 聚焦活动券与通道承压</div></div><button class="secondary-action">复用</button></div>
+          </div>
+        </div>
+        <div class="workspace-panel">
+          <div class="panel-title">分析专项</div>
+          <div class="panel-desc">进入专项后查看该主题下的负责人、协作人员、关注指标、策略实验、阈值配置和历史报告。</div>
+          <div class="agent-grid" style="grid-template-columns:1fr; margin-bottom:0;">
+            <div class="agent-card"><h4>支付成功率专项</h4><p>持续追踪收银台、银行卡、京东支付、大额交易、新客首单等成功率问题。</p><div class="card-meta"><span class="meta-tag green">进行中</span><span class="meta-tag">负责人：产品张瑛</span><span class="meta-tag">分析师：姜念英</span></div></div>
+            <div class="agent-card"><h4>通道成本降费专项</h4><p>持续跟踪通道路由、费率结构、成本节省与成功率影响之间的平衡。</p><div class="card-meta"><span class="meta-tag">规划中</span><span class="meta-tag">负责人：产品李根</span></div></div>
+          </div>
+          <div class="insight-actions"><button class="primary-action" onclick="document.getElementById('project-detail').scrollIntoView({behavior:'smooth'})">查看专项详情</button><button class="secondary-action">创建新专项</button></div>
+        </div>
+      </div>
+
+      <div class="workspace-panel" id="project-detail">
+        <div class="panel-title">支付成功率专项详情</div>
+        <div class="panel-desc">专项详情聚合这个主题下最重要的信息：谁负责、看哪些指标、有哪些策略正在跑、阈值怎么设、最近有哪些报告。</div>
+        <div class="agent-grid">
+          <div class="agent-card"><h4>人员</h4><p>负责人：产品张瑛<br>分析师：姜念英、刘亚<br>运营：蓝左强<br>商务协同：李根</p><div class="card-meta"><span class="meta-tag green">产品负责</span><span class="meta-tag">跨角色协作</span></div></div>
+          <div class="agent-card"><h4>指标</h4><p>核心指标：收银台支付成功率、银行卡支付成功率<br>护栏指标：提单量、成单量、客诉率、用户改选率、通道成本</p><div class="card-meta"><span class="meta-tag green">核心指标</span><span class="meta-tag orange">护栏指标</span></div></div>
+          <div class="agent-card"><h4>阈值</h4><p>收银台成功率低于 99.5%，或环比下降超过 0.2pp 时触发预警；大额交易成功率单小时下降 1pp 触发专项诊断。</p><div class="card-meta"><span class="meta-tag">京 me</span><span class="meta-tag">邮件</span><span class="meta-tag">工作台提醒</span></div></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="table-card"><div class="table-card-header"><h3>专项策略</h3><span class="table-badge badge-live">实验中</span></div><table><thead><tr><th>策略</th><th>状态</th><th>核心指标</th><th>当前结论</th></tr></thead><tbody><tr><td>90天3次失败卡片降权</td><td>20% 切量</td><td>成功率 +0.21pp</td><td>正向，建议扩大</td></tr><tr><td>新客绑卡失败后备选支付推荐</td><td>10% 切量</td><td>成单率 +0.08pp</td><td>继续观察</td></tr><tr><td>高风险大额卡片二次核验</td><td>5% 切量</td><td>客诉率 +0.03%</td><td>需复核</td></tr></tbody></table></div>
+        <div class="table-card"><div class="table-card-header"><h3>专项报告</h3><span class="table-badge badge-live">持续更新</span></div><table><thead><tr><th>报告</th><th>类型</th><th>时间</th><th>结论</th></tr></thead><tbody><tr><td>支付成功率下降初始洞察</td><td>首次研究</td><td>2026-07</td><td>定位失败卡片重复优先勾选问题</td></tr><tr><td>90天3次失败卡片降权实验效果</td><td>策略效果</td><td>2026-08</td><td>成功率提升，建议扩大切量</td></tr><tr><td>支付成功率 8 月月度分析结论</td><td>周期复盘</td><td>每月</td><td>汇总策略贡献和未解决风险</td></tr></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-analysis">
+      <div class="content-header"><h2>诊断分析</h2><p>输入指标或从工作台异常入口进入，自动对支付成功率异常做归因分析</p></div>
+      <div class="workspace-panel">
+        <div class="panel-title">异常指标诊断入口</div>
+        <div class="prompt-box"><textarea placeholder="输入指标或异常事件，例如：大额交易成功率 09:45 从 99.1% 降至 96.8%，请按业务场景、支付方式、用户分层、页面路径归因。">大额交易成功率 09:45 从 99.1% 降至 96.8%，影响集中在银行卡通道 A / 商户 D，请输出归因结论和建议。</textarea><div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">从工作台异常带入</span><span class="memory-chip">按支付方式拆解</span><span class="memory-chip">按用户分层拆解</span></div><button class="primary-action">开始归因</button></div></div>
+      </div>
+      <div class="insight-card"><h3>归因结论：大额交易成功率下降</h3><p><strong>主要原因：</strong>银行卡通道 A 在 1000 元以上订单出现授权失败率上升，叠加商户 D 重试请求放大提单量，导致整体成功率下滑。</p><p><strong>分析维度：</strong>业务场景、支付方式、快捷支付、用户分层、页面路径、权益补贴、App 版本；同时联动提单量和成单量，避免只看成功率误判。</p><div class="card-meta"><span class="meta-tag orange">置信度：中高</span><span class="meta-tag">影响：-2.3pp</span><span class="meta-tag green">建议：人工确认后下发策略</span></div></div>
+      <div class="table-card"><div class="table-card-header"><h3>归因拆解</h3><span class="table-badge badge-warning">需关注</span></div><table><thead><tr><th>维度</th><th>异常表现</th><th>提单量占比</th><th>贡献度</th><th>建议</th></tr></thead><tbody><tr><td>银行卡通道 A</td><td class="number">成功率 -3.8pp</td><td>42%</td><td>高</td><td>切换部分流量至备选通道</td></tr><tr><td>商户 D 大额订单</td><td class="number">重试率 +28%</td><td>18%</td><td>中</td><td>限制重复提交并通知商户排查</td></tr><tr><td>新用户快捷支付</td><td class="number">绑卡失败 +1.2pp</td><td>13%</td><td>中</td><td>优化失败提示与替代支付推荐</td></tr></tbody></table></div>
+    </div>
+
+    <!-- Page: Opportunity Inspection -->
+    <div class="page" id="page-opportunity-inspection">
+      <div class="content-header"><h2>商机巡检</h2><p>每日从全网主流公开平台巡检支付与金融科技情报，按等级、评分、行业和高度相关责任角色分区展示</p></div>
+      <div class="chart-card">
+        <div class="chart-card-header"><h3>与我相关</h3><span class="table-badge badge-warning">优先处理</span></div>
+        <div class="opportunity-grid">
+          <div class="opportunity-card"><h4>银联发布银行卡支付体验优化建议</h4><p>来源：银联公开政策建议 / 行业媒体。内容：建议支付机构强化失败原因解释、重试节流和替代支付引导。</p><p><strong>机会点：</strong>结合“90天3次失败卡片降权”策略，优化银行卡失败后推荐链路。</p><div class="card-meta"><span class="meta-tag green">A 级</span><span class="meta-tag">评分 96</span><span class="meta-tag">行业：银行卡</span><span class="meta-tag orange">责任：产品/分析师</span><a class="meta-tag" href="https://www.chinaunionpay.com/" target="_blank">外部链接</a></div></div>
+          <div class="opportunity-card"><h4>支付宝 AI 大会披露智能支付路由</h4><p>来源：支付宝公开大会信息 / 科技媒体。内容：AI 辅助识别用户支付偏好与失败风险，动态推荐支付方式。</p><p><strong>机会点：</strong>对标收银台支付方式推荐、失败后挽回和支付成功率 Agent 能力。</p><div class="card-meta"><span class="meta-tag green">A 级</span><span class="meta-tag">评分 92</span><span class="meta-tag">行业：第三方支付</span><span class="meta-tag orange">责任：产品</span><a class="meta-tag" href="https://www.alipay.com/" target="_blank">外部链接</a></div></div>
+          <div class="opportunity-card"><h4>核验中心风险标签回传口径调整</h4><p>来源：内部平台变更通知。内容：风险标签粒度从卡维度增强到卡×场景维度。</p><p><strong>机会点：</strong>提升策略实验命中准确度，避免过度降权导致支付体验损失。</p><div class="card-meta"><span class="meta-tag green">A 级</span><span class="meta-tag">评分 93</span><span class="meta-tag">行业：内部能力</span><span class="meta-tag orange">责任：产品/分析师</span></div></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header"><h3>全部情报</h3><span class="table-badge badge-live">价值 × 确定性 × 时间紧急度</span></div>
+        <div class="opportunity-grid">
+          <div class="opportunity-card"><h4>央行支付互联互通持续推进</h4><p>来源：公开政策新闻。内容：支付机构间互联互通体验与合规要求持续加强。</p><p><strong>机会点：</strong>评估京东支付、银行卡、外部钱包的推荐顺序和兜底路径。</p><div class="card-meta"><span class="meta-tag green">A 级</span><span class="meta-tag">评分 90</span><span class="meta-tag">行业：监管</span><span class="meta-tag orange">责任：产品/商务</span><a class="meta-tag" href="https://www.pbc.gov.cn/" target="_blank">外部链接</a></div></div>
+          <div class="opportunity-card"><h4>旅游出行暑期大额订单增长</h4><p>来源：行业报告 / 公开资讯。内容：旅游、票务、酒店等高客单订单增长，银行卡与分期支付需求上升。</p><p><strong>机会点：</strong>提前配置大额支付通道容量与风控核验兜底。</p><div class="card-meta"><span class="meta-tag green">A 级</span><span class="meta-tag">评分 89</span><span class="meta-tag">行业：本地生活</span><span class="meta-tag orange">责任：运营/商务</span></div></div>
+          <div class="opportunity-card"><h4>竞品上线一键绑卡能力</h4><p>来源：产品更新日志 / 外部新闻。内容：缩短绑卡链路并强化失败重试引导。</p><p><strong>机会点：</strong>优化新客首绑成功率，沉淀收银台引导策略。</p><div class="card-meta"><span class="meta-tag orange">B 级</span><span class="meta-tag">评分 84</span><span class="meta-tag">行业：竞品</span><span class="meta-tag orange">责任：产品</span></div></div>
+          <div class="opportunity-card"><h4>教育缴费场景分期需求提升</h4><p>来源：商机报告。内容：暑期教育培训缴费集中，分期和银行卡大额支付需求增加。</p><p><strong>机会点：</strong>联动商务筛选 Top 商户，配置更稳的支付方式推荐。</p><div class="card-meta"><span class="meta-tag orange">B 级</span><span class="meta-tag">评分 81</span><span class="meta-tag">行业：教育</span><span class="meta-tag orange">责任：商务/运营</span></div></div>
+          <div class="opportunity-card"><h4>用户对支付失败原因透明度关注上升</h4><p>来源：社媒与客服反馈。内容：用户希望明确知道失败原因和可替代方案。</p><p><strong>机会点：</strong>优化失败提示文案、重试策略和备选支付推荐。</p><div class="card-meta"><span class="meta-tag">C 级</span><span class="meta-tag">评分 74</span><span class="meta-tag">行业：用户体验</span><span class="meta-tag orange">责任：产品/运营</span></div></div>
+          <div class="opportunity-card"><h4>商户侧重复提交导致失败放大</h4><p>来源：内部巡检。内容：部分商户在支付失败后重复提交，影响提单量和成功率判断。</p><p><strong>机会点：</strong>增加商户侧重试节流提醒与异常商户诊断入口。</p><div class="card-meta"><span class="meta-tag orange">B 级</span><span class="meta-tag">评分 86</span><span class="meta-tag">行业：商户服务</span><span class="meta-tag orange">责任：商务/分析师</span></div></div>
+        </div>
+      </div>
+      <div class="workspace-panel">
+        <div class="panel-title">价值 × 确定性 × 时间紧急度 分级矩阵</div>
+        <div class="intel-matrix">
+          <div class="matrix-cell high"><strong>高价值 / 高确定 / 高紧急</strong><span>银联体验优化建议、核验中心标签调整</span></div>
+          <div class="matrix-cell high"><strong>高价值 / 中确定 / 高紧急</strong><span>支付宝 AI 支付路由、暑期大额订单增长</span></div>
+          <div class="matrix-cell mid"><strong>中价值 / 高确定 / 中紧急</strong><span>教育缴费分期需求、商户重复提交治理</span></div>
+          <div class="matrix-cell mid"><strong>中价值 / 中确定 / 低紧急</strong><span>竞品一键绑卡、失败提示透明度讨论</span></div>
+          <div class="matrix-cell low"><strong>低价值 / 低确定 / 观察</strong><span>泛金融营销热点、低相关竞品活动</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Opportunity Analysis -->
+    <div class="page" id="page-opportunity-analysis">
+      <div class="content-header"><h2>商机分析</h2><p>输入商机主题或分析诉求，结合记忆能力快速生成商机分析报告</p></div>
+      <div class="workspace-panel"><div class="panel-title">商机分析对话框</div><div class="prompt-box"><textarea placeholder="例如：分析竞品一键绑卡能力对京东支付新客成功率的影响，并输出机会点、验证指标和策略建议。"></textarea><div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">竞品能力对标</span><span class="memory-chip">行业高峰保障</span><span class="memory-chip">商户机会筛选</span></div><button class="primary-action">生成商机分析</button></div></div></div>
+      <div class="table-card"><div class="table-card-header"><h3>历史商机报告</h3><span class="table-badge badge-live">可快捷进入</span></div><table><thead><tr><th>报告</th><th>分析对象</th><th>复用思路</th><th>最近更新</th></tr></thead><tbody><tr><td>快捷绑卡竞品分析</td><td>新客首单支付</td><td>链路对比 / 成功率指标 / 策略建议</td><td>今天</td></tr><tr><td>教育行业分期机会</td><td>大额银行卡支付</td><td>行业规模 / 支付方式 / 商户名单</td><td>昨日</td></tr></tbody></table></div>
+    </div>
+
+
+
+
+    <!-- Page: Strategy Tool -->
+    <div class="page" id="page-strategy-tool">
+      <div class="content-header"><h2>策略工具</h2><p>维护可被策略实验调用的策略库，明确每条策略的条件、行动、生产系统和维护权限</p></div>
+      <div class="workspace-panel">
+        <div class="panel-title">什么是策略</div>
+        <div class="panel-desc">策略由“条件”和“行动”两部分组成：当满足某个业务条件时，在生产系统中执行对应行动。例如“某张银行卡在 m 天支付失败 n 次”是条件，“在历山中将银行卡排序往下调一位”是行动。行动直接打通生产系统，因此仅产品角色可维护可执行行动。</div>
+        <div class="agent-grid">
+          <div class="agent-card"><h4>条件</h4><p>例如：某张银行卡在 m 天内支付失败 n 次；某用户在收银台连续改选支付方式；某商户在活动期间失败率超过阈值。</p><div class="card-meta"><span class="meta-tag">可由分析师建议</span><span class="meta-tag">需要指标口径</span></div></div>
+          <div class="agent-card"><h4>行动</h4><p>例如：在历山中将银行卡排序往下调一位；在黄流策略后台切换推荐方式；在核验中心增加验证兜底。</p><div class="card-meta"><span class="meta-tag green">仅产品维护</span><span class="meta-tag orange">需生产系统支持</span></div></div>
+          <div class="agent-card"><h4>需求联动</h4><p>如果产品提出新增行动类型，自动同步到需求管理系统“行云”，创建行动接入需求和生产系统改造任务。</p><div class="card-meta"><span class="meta-tag">行云打通</span><span class="meta-tag">自动创建需求</span></div></div>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="table-card"><div class="table-card-header"><h3>条件库</h3><span class="table-badge badge-live">可复用条件</span></div><table><thead><tr><th>条件名称</th><th>条件定义</th><th>依赖指标/字段</th><th>创建人</th><th>状态</th></tr></thead><tbody><tr><td>90天失败卡片</td><td>某张银行卡在 90 天支付失败 3 次</td><td>card_id、trade_status、fail_reason、trade_time</td><td>分析师-刘亚</td><td><span class="status-dot green"></span>已校验</td></tr><tr><td>新客首绑失败</td><td>新用户首次绑卡失败且仍停留在收银台</td><td>user_type、bind_status、cashier_session</td><td>分析师-姜念英</td><td><span class="status-dot green"></span>已校验</td></tr><tr><td>高风险大额支付</td><td>卡片风险标签为高且订单金额超过 1000 元</td><td>risk_tag、order_amount、pay_method</td><td>分析师-李博鸿</td><td><span class="status-dot yellow"></span>灰度验证</td></tr></tbody></table></div>
+        <div class="table-card"><div class="table-card-header"><h3>行动库</h3><span class="table-badge badge-warning">仅产品维护</span></div><table><thead><tr><th>行动名称</th><th>行动定义</th><th>生产系统</th><th>维护人</th><th>状态</th></tr></thead><tbody><tr><td>银行卡排序下调</td><td>在历山中将命中银行卡排序往下调一位</td><td>历山</td><td>产品-张瑛</td><td><span class="status-dot green"></span>可执行</td></tr><tr><td>推荐备选支付方式</td><td>推荐京东支付或白条作为备选支付方式</td><td>黄流策略后台</td><td>产品-李根</td><td><span class="status-dot green"></span>可执行</td></tr><tr><td>触发二次核验</td><td>对高风险大额支付触发核验中心二次核验</td><td>核验中心</td><td>产品-张瑛</td><td><span class="status-dot yellow"></span>灰度中</td></tr><tr><td>AI 推荐支付挽回组件</td><td>展示 AI 推荐的高成功率支付方式</td><td>待接入</td><td>产品-李根</td><td><span class="status-dot red"></span>需行云建需</td></tr></tbody></table></div>
+      </div>
+      <div class="table-card"><div class="table-card-header"><h3>策略组合示例</h3><span class="table-badge badge-live">条件 × 行动</span></div><table><thead><tr><th>策略名称</th><th>引用条件</th><th>引用行动</th><th>生产系统</th><th>状态</th></tr></thead><tbody><tr><td>90天失败卡片降权</td><td>90天失败卡片</td><td>银行卡排序下调</td><td>历山</td><td><span class="status-dot green"></span>可执行</td></tr><tr><td>新客绑卡失败兜底</td><td>新客首绑失败</td><td>推荐备选支付方式</td><td>黄流策略后台</td><td><span class="status-dot green"></span>可执行</td></tr><tr><td>高风险卡片加强核验</td><td>高风险大额支付</td><td>触发二次核验</td><td>核验中心</td><td><span class="status-dot yellow"></span>灰度中</td></tr></tbody></table></div>
+      <div class="charts-row">
+        <div class="workspace-panel"><div class="panel-title">新增策略行动</div><div class="prompt-box"><textarea>行动名称：收银台 AI 推荐支付挽回组件
+目标系统：历山 + 收银台配置平台
+触发条件：用户连续 2 次支付失败
+执行动作：展示 AI 推荐的高成功率支付方式
+行云需求：自动创建生产系统接入需求、接口字段和验收指标</textarea><div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">仅产品可提交</span><span class="memory-chip">校验生产支持</span><span class="memory-chip">同步行云</span></div><button class="primary-action">创建行云需求</button></div></div></div>
+        <div class="chart-card"><div class="chart-card-header"><h3>维护权限规则</h3></div><div class="report-list"><div class="report-item"><div><div class="report-main">分析师</div><div class="report-sub">维护基础数据工具、Skill、分析框架，可建议策略条件和观测指标</div></div><span class="meta-tag">工具维护</span></div><div class="report-item"><div><div class="report-main">产品</div><div class="report-sub">维护策略行动、生产系统映射、行云需求和策略库可执行状态</div></div><span class="meta-tag green">行动维护</span></div><div class="report-item"><div><div class="report-main">运营</div><div class="report-sub">维护业务知识库、活动经验、运营策略口径和复盘结论</div></div><span class="meta-tag orange">知识维护</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- Page: Strategy Publish -->
+    <div class="page" id="page-strategy-publish">
+      <div class="content-header"><h2>策略发布</h2><p>将分析结论结构化为策略定义，并推送至黄流策略后台、核验中心、历山等生产策略平台</p></div>
+      <div class="workspace-panel">
+        <div class="panel-title">策略定义</div>
+        <div class="panel-desc">将策略拆成“系统、条件、行动、实验配置”四个部分，确保策略可审核、可切量、可监控、可回滚。</div>
+        <div class="agent-grid">
+          <div class="agent-card"><h4>策略实验系统</h4><p>目标系统：历山策略平台</p><div class="card-meta"><span class="meta-tag green">推荐</span><span class="meta-tag">可选：黄流策略后台</span><span class="meta-tag">可选：核验中心</span></div></div>
+          <div class="agent-card"><h4>条件</h4><p>如果一张卡在 90 天内出现 3 次交易失败，且失败原因为银行授权失败或余额不足。</p><div class="card-meta"><span class="meta-tag">银行卡维度</span><span class="meta-tag orange">90 天窗口</span></div></div>
+          <div class="agent-card"><h4>行动</h4><p>则该卡不再作为收银台优先勾选支付方式，并推荐用户切换至成功率更高的备选方式。</p><div class="card-meta"><span class="meta-tag green">提升成功率</span><span class="meta-tag">可回滚</span></div></div>
+        </div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-card-header"><h3>发布配置</h3><span class="table-badge badge-warning">需权限校验</span></div>
+          <div class="prompt-box"><textarea>策略名称：90天3次失败卡片降权
+目标系统：历山
+策略条件：同一银行卡 90 天内交易失败次数 >= 3
+执行行动：不再优先勾选该卡，展示备选支付方式
+回滚条件：实验组支付成功率低于对照组 0.2pp 或客诉率上升</textarea></div>
+          <div class="framework-flow">
+            <div class="flow-step"><strong>切量</strong>5% → 20% → 50% → 100%</div>
+            <div class="flow-step"><strong>监控周期</strong>7 天实验 + 3 天稳定性观察</div>
+            <div class="flow-step"><strong>观测指标</strong>支付成功率、提单量、成单量、用户改选率</div>
+            <div class="flow-step"><strong>权限</strong>产品负责人审批 + 策略平台发布权限</div>
+            <div class="flow-step"><strong>发布</strong>推送至历山并生成实验 ID</div>
+          </div>
+          <div class="insight-actions"><button class="primary-action">推送到历山</button><button class="secondary-action">保存为草稿</button><button class="secondary-action">发起审批</button></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header"><h3>从分析结果带入</h3></div>
+          <div class="report-list">
+            <div class="report-item"><div><div class="report-main">银行卡多次失败后优先勾选导致成功率下降</div><div class="report-sub">来源：专项分析 / 置信度高 / 建议发起 5% 灰度</div></div><button class="secondary-action">引用</button></div>
+            <div class="report-item"><div><div class="report-main">新客首绑失败后缺少替代支付推荐</div><div class="report-sub">来源：诊断分析 / 需补充核验中心配置</div></div><button class="secondary-action">引用</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Strategy Monitor -->
+    <div class="page" id="page-strategy-monitor">
+      <div class="content-header"><h2>策略监控</h2><p>查看自己和其他人推送的策略实验，追踪切量进度、实验结果和风险信号</p></div>
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-label">我发布的策略 <span>进行中</span></div><div class="metric-value">6</div><div class="metric-change up">2 条效果正向</div></div>
+        <div class="metric-card"><div class="metric-label">团队策略 <span>本周</span></div><div class="metric-value">18</div><div class="metric-change neutral">5 条待观察</div></div>
+        <div class="metric-card"><div class="metric-label">成功率提升 <span>实验组</span></div><div class="metric-value">+0.21<span class="unit">pp</span></div><div class="metric-change up">置信度 95%</div></div>
+        <div class="metric-card"><div class="metric-label">风险策略 <span>需处理</span></div><div class="metric-value">1</div><div class="metric-change down">客诉率轻微上升</div></div>
+      </div>
+      <div class="table-card"><div class="table-card-header"><h3>策略实验列表</h3><span class="table-badge badge-live">实时同步历山 / 黄流 / 核验中心</span></div><table><thead><tr><th>策略</th><th>发布人</th><th>系统</th><th>切量</th><th>观测指标</th><th>实验结果</th></tr></thead><tbody><tr><td>90天3次失败卡片降权</td><td>张瑛</td><td>历山</td><td>20%</td><td>成功率 +0.21pp</td><td><span class="status-dot green"></span>正向，建议扩大</td></tr><tr><td>新客绑卡失败后推荐白条</td><td>姜念英</td><td>黄流策略后台</td><td>10%</td><td>成单率 +0.08pp</td><td><span class="status-dot yellow"></span>观察中</td></tr><tr><td>高风险商户快捷支付降权</td><td>李博鸿</td><td>核验中心</td><td>5%</td><td>客诉率 +0.03%</td><td><span class="status-dot red"></span>需复核</td></tr></tbody></table></div>
+    </div>
+
+    <!-- Page: Framework -->
+    <div class="page" id="page-framework">
+      <div class="content-header"><h2>分析框架</h2><p>选择不同分析 Agent，并引用支付成功率业务运营闭环框架 · 由维护者分析师负责维护</p></div>
+      <div class="agent-grid"><div class="agent-card"><h4>支付成功率 Agent</h4><p>围绕支付成功率监控、预警、归因、策略建议、AB 验证、生产执行和复盘沉淀。</p><div class="card-meta"><span class="meta-tag green">当前推荐</span><span class="meta-tag">张瑛常用</span></div></div><div class="agent-card"><h4>通道成本降费 Agent</h4><p>面向通道成本、路由策略、费率结构、成功率与成本平衡的专项分析。</p><div class="card-meta"><span class="meta-tag">成本优化</span></div></div><div class="agent-card"><h4>收银台体验 Agent</h4><p>面向收银台路径、支付方式展示、失败提示和转化漏斗的体验分析。</p><div class="card-meta"><span class="meta-tag">体验转化</span></div></div></div>
+      <div class="workspace-panel"><div class="panel-title">支付成功率分析框架</div><div class="panel-desc">参考需求文档，将问题处理拆成可复用闭环，确保每次分析都有数据证据、策略建议和复盘沉淀。</div><div class="framework-flow"><div class="flow-step"><strong>1 数据监控</strong>每日监控成功率、提单量、成单量和快捷支付指标</div><div class="flow-step"><strong>2 异常预警</strong>低于阈值或同环比异常时触发预警和通知</div><div class="flow-step"><strong>3 归因分析</strong>按场景、活动、支付方式、用户分层、路径拆解</div><div class="flow-step"><strong>4 策略建议</strong>优先匹配历史案例，无经验则发起 AB 验证</div><div class="flow-step"><strong>5 执行复盘</strong>生成生产指令，追踪效果并沉淀知识库</div></div></div>
+    </div>
+
+
+
+
+
+    <!-- Page: Analysis Agent -->
+    <div class="page" id="page-analysis-agent">
+      <div class="content-header"><h2>分析agent</h2><p>由 JoyAgent 引入，展示平台已接入的分析 Agent、创建人和跳转入口</p></div>
+      <div class="agent-grid">
+        <div class="agent-card"><h4>支付成功率 Agent</h4><p>支持支付成功率监控、异常归因、策略建议、实验复盘。</p><div class="card-meta"><span class="meta-tag green">已引入</span><span class="meta-tag">创建人：姜念英</span><a class="meta-tag" href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">打开 JoyAgent</a></div></div>
+        <div class="agent-card"><h4>通道成本降费 Agent</h4><p>分析通道费率、路由成本、成功率与成本之间的平衡策略。</p><div class="card-meta"><span class="meta-tag green">已引入</span><span class="meta-tag">创建人：蓝左强</span><a class="meta-tag" href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">打开 JoyAgent</a></div></div>
+        <div class="agent-card"><h4>收银台体验 Agent</h4><p>分析收银台页面路径、支付方式展示、失败提示和转化漏斗。</p><div class="card-meta"><span class="meta-tag green">已引入</span><span class="meta-tag">创建人：张瑛</span><a class="meta-tag" href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">打开 JoyAgent</a></div></div>
+        <div class="agent-card"><h4>商机情报 Agent</h4><p>巡检外部公开新闻、政策、竞品动态，并生成价值和紧急度评分。</p><div class="card-meta"><span class="meta-tag orange">试运行</span><span class="meta-tag">创建人：李博鸿</span><a class="meta-tag" href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">打开 JoyAgent</a></div></div>
+        <div class="agent-card"><h4>策略实验 Agent</h4><p>辅助生成策略实验配置、切量方案、观测指标和复盘报告。</p><div class="card-meta"><span class="meta-tag green">已引入</span><span class="meta-tag">创建人：李根</span><a class="meta-tag" href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">打开 JoyAgent</a></div></div>
+        <div class="agent-card"><h4>指标口径 Agent</h4><p>校验指标口径、SQL、字段血缘和应用专项绑定关系。</p><div class="card-meta"><span class="meta-tag">待发布</span><span class="meta-tag">创建人：刘亚</span><a class="meta-tag" href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">打开 JoyAgent</a></div></div>
+      </div>
+      <div class="table-card"><div class="table-card-header"><h3>JoyAgent 接入清单</h3><span class="table-badge badge-live">平台已引入</span></div><table><thead><tr><th>Agent</th><th>创建人</th><th>应用页面</th><th>状态</th><th>入口</th></tr></thead><tbody><tr><td>支付成功率 Agent</td><td>姜念英</td><td>专项分析 / 诊断分析</td><td><span class="status-dot green"></span>已上线</td><td><a href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">JoyAgent</a></td></tr><tr><td>策略实验 Agent</td><td>李根</td><td>策略发布 / 策略监控</td><td><span class="status-dot green"></span>已上线</td><td><a href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">JoyAgent</a></td></tr><tr><td>商机情报 Agent</td><td>李博鸿</td><td>商机巡检</td><td><span class="status-dot yellow"></span>试运行</td><td><a href="https://autobots.jd.com/team/private/chartmgr/163863" target="_blank">JoyAgent</a></td></tr></tbody></table></div>
+    </div>
+
+    <!-- Page: Metrics Setting -->
+    <div class="page" id="page-metrics-setting">
+      <div class="content-header"><h2>指标设置</h2><p>管理标准观测指标与自定义指标，统一口径、数据来源和应用专项</p></div>
+      <div class="table-card"><div class="table-card-header"><h3>标准观测指标</h3><span class="table-badge badge-live">平台推荐</span></div><table><thead><tr><th>指标名称</th><th>口径说明</th><th>应用分析专项</th><th>创建人</th><th>使用人数</th></tr></thead><tbody><tr><td>收银台支付成功率</td><td>支付成单量 / 支付提单量，剔除用户主动取消</td><td>诊断分析、专项复盘、策略监控</td><td>分析师-刘亚</td><td class="number">128</td></tr><tr><td>银行卡支付成功率</td><td>银行卡支付成单量 / 银行卡支付提单量</td><td>支付方式排序分析、通道策略实验</td><td>产品-李根</td><td class="number">96</td></tr><tr><td>快捷支付绑卡成功率</td><td>绑卡成功用户数 / 发起绑卡用户数</td><td>新客首单分析、竞品对标</td><td>产品-张瑛</td><td class="number">74</td></tr><tr><td>策略实验成功率提升</td><td>实验组支付成功率 - 对照组支付成功率</td><td>策略发布、策略监控、AB 实验评估</td><td>分析师-蓝左强</td><td class="number">52</td></tr></tbody></table></div>
+      <div class="charts-row">
+        <div class="workspace-panel">
+          <div class="panel-title">自定义指标定义</div>
+          <div class="panel-desc">支持通过数据表字段、取数 SQL 或自然语言定义指标，并绑定到专项分析、诊断分析或策略实验监控。</div>
+          <div class="prompt-box"><textarea placeholder="输入指标定义，例如：指标名称=90天失败卡片占比；数据表=pay_order_detail；字段=card_id、fail_reason、trade_time；SQL=...">指标名称：90天3次失败卡片占比
+数据表：pay_order_detail
+字段：card_id、trade_status、fail_reason、trade_time
+口径：90天内同一 card_id 失败次数 >= 3 的卡片数 / 活跃支付卡片数
+应用专项：策略发布、策略监控、诊断分析</textarea><div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">从数据表定义</span><span class="memory-chip">粘贴取数 SQL</span><span class="memory-chip">自然语言转指标</span></div><button class="primary-action">保存指标</button></div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header"><h3>指标治理规则</h3></div>
+          <div class="report-list">
+            <div class="report-item"><div><div class="report-main">口径校验</div><div class="report-sub">检查分子分母、过滤条件、时间窗口是否完整</div></div><span class="meta-tag green">自动</span></div>
+            <div class="report-item"><div><div class="report-main">使用审批</div><div class="report-sub">进入策略监控的指标需经过创建人或数据分析师确认</div></div><span class="meta-tag orange">必要</span></div>
+            <div class="report-item"><div><div class="report-main">血缘记录</div><div class="report-sub">记录数据表、字段、SQL、应用专项和历史版本</div></div><span class="meta-tag">可追溯</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Knowledge -->
+    <div class="page" id="page-knowledge">
+      <div class="content-header"><h2>知识库</h2><p>调用、增加或修改支付成功率相关知识库 · 由产品、运营维护业务经验与复盘结论</p></div>
+      <div class="knowledge-grid"><div class="knowledge-card"><h4>核验工具知识库</h4><p>沉淀核验工具使用方法、数据校验口径、异常排查 SOP。</p><div class="card-meta"><span class="meta-tag">调用</span><span class="meta-tag orange">修改</span></div></div><div class="knowledge-card"><h4>银行卡知识库</h4><p>维护银行卡支付方式、通道表现、绑卡路径、失败原因和历史策略案例。</p><div class="card-meta"><span class="meta-tag green">高频使用</span><span class="meta-tag">新增案例</span></div></div><div class="knowledge-card"><h4>归因案例知识库</h4><p>沉淀历史归因结论、证据数据、置信度、策略建议和复盘报告。</p><div class="card-meta"><span class="meta-tag">相似案例匹配</span></div></div></div>
+      <div class="workspace-panel"><div class="panel-title">知识库维护入口</div><div class="prompt-box"><textarea placeholder="输入需要新增或修改的知识，例如：新增银行卡通道 A 大额订单授权失败案例，补充触发条件、证据指标和推荐策略。"></textarea><div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">新增历史案例</span><span class="memory-chip">修改指标口径</span><span class="memory-chip">补充 SOP</span></div><button class="primary-action">提交知识变更</button></div></div></div>
+    </div>
+
+    <!-- Page: Skill -->
+    <div class="page" id="page-skills">
+      <div class="content-header"><h2>Skill</h2><p>通用分析方法库，可被专项分析、诊断分析和商机分析组合调用 · 由维护者分析师负责维护</p></div>
+      <div class="agent-grid"><div class="agent-card"><h4>归因分析</h4><p>从指标变化出发，拆解业务场景、活动策略、支付方式、用户分层、页面路径和权益补贴。</p><div class="card-meta"><span class="meta-tag green">支付成功率常用</span></div></div><div class="agent-card"><h4>趋势诊断</h4><p>识别同环比、周期性、突变点和趋势拐点，自动关联历史事件。</p><div class="card-meta"><span class="meta-tag">监控预警</span></div></div><div class="agent-card"><h4>AB 实验评估</h4><p>对策略上线前后的实验组与对照组进行成功率、提单量、成单量评估。</p><div class="card-meta"><span class="meta-tag">策略验证</span></div></div><div class="agent-card"><h4>漏斗分析</h4><p>拆解提单、绑卡、支付确认、成单各环节转化损失。</p><div class="card-meta"><span class="meta-tag">页面路径</span></div></div><div class="agent-card"><h4>竞品对标</h4><p>将公开信息转化为产品能力差异、机会点和验证指标。</p><div class="card-meta"><span class="meta-tag orange">行业洞察</span></div></div><div class="agent-card"><h4>复盘报告生成</h4><p>结构化输出背景、问题、归因、策略、效果、结论和知识库沉淀。</p><div class="card-meta"><span class="meta-tag">报告复用</span></div></div></div>
+
+    <!-- Page: Personal Config -->
+    <div class="page" id="page-personal-config">
+      <div class="content-header"><h2>个性化配置</h2><p>配置我的身份、权限、常用指标和使用偏好，让工作台、专项分析和策略实验按个人职责自动适配</p></div>
+      <div class="agent-grid">
+        <div class="agent-card"><h4>我的身份</h4><p>当前身份：产品经理<br>可选身份：产品、分析师、运营、商务、平台维护者</p><div class="card-meta"><span class="meta-tag green">产品</span><span class="meta-tag">支付成功率负责人</span></div></div>
+        <div class="agent-card"><h4>我的权限</h4><p>可配置新增 Skill、新增 Agent、创建专项、维护知识库、维护策略行动、发布策略实验等权限。</p><div class="card-meta"><span class="meta-tag green">创建专项</span><span class="meta-tag">新增 Agent</span><span class="meta-tag orange">策略发布需审批</span></div></div>
+        <div class="agent-card"><h4>我的常用指标</h4><p>收银台支付成功率、银行卡支付成功率、快捷支付提单量、快捷支付成单量、大额交易成功率。</p><div class="card-meta"><span class="meta-tag">成功率</span><span class="meta-tag">提单量</span><span class="meta-tag">成单量</span></div></div>
+      </div>
+      <div class="workspace-panel"><div class="panel-title">我的偏好</div><div class="prompt-box"><textarea>默认首页：支付成功率工作台
+默认预警方式：京 me + 工作台提醒，P0/P1 同步邮件
+常用 Agent：支付成功率 Agent、策略实验 Agent、指标口径 Agent
+常用 Skill：归因分析、趋势诊断、AB 实验评估、复盘报告生成
+报告偏好：先结论后证据，必须包含影响范围、置信度、建议动作</textarea><div class="prompt-actions"><div class="memory-strip"><span class="memory-chip">保存偏好</span><span class="memory-chip">同步工作台</span><span class="memory-chip">应用到专项</span></div><button class="primary-action">保存配置</button></div></div></div>
+      <div class="table-card"><div class="table-card-header"><h3>权限矩阵</h3><span class="table-badge badge-live">按身份配置</span></div><table><thead><tr><th>权限</th><th>产品</th><th>分析师</th><th>运营</th><th>商务</th></tr></thead><tbody><tr><td>创建持续专项</td><td>允许</td><td>允许</td><td>申请</td><td>申请</td></tr><tr><td>新增 Skill</td><td>申请</td><td>允许</td><td>申请</td><td>申请</td></tr><tr><td>新增 Agent</td><td>允许</td><td>允许</td><td>申请</td><td>申请</td></tr><tr><td>维护知识库</td><td>允许</td><td>允许</td><td>允许</td><td>允许</td></tr><tr><td>维护策略行动</td><td>允许</td><td>不可</td><td>不可</td><td>不可</td></tr><tr><td>发布策略实验</td><td>审批后允许</td><td>不可</td><td>申请</td><td>申请</td></tr></tbody></table></div>
+    </div>
+
+    </div>
+
+    
+  </div>
+</main>
+
+<script>
+const pageToMenu = {
+  overview: 'workbench',
+  'special-analysis': 'strategy-analysis',
+  analysis: 'strategy-analysis',
+  'opportunity-inspection': 'industry-insight',
+  'opportunity-analysis': 'industry-insight',
+  'strategy-publish': 'strategy-experiment',
+  'strategy-monitor': 'strategy-experiment',
+  'strategy-tool': 'strategy-experiment',
+  framework: 'analysis-tools',
+  'analysis-agent': 'analysis-tools',
+  'metrics-setting': 'analysis-tools',
+  knowledge: 'analysis-tools',
+  skills: 'analysis-tools',
+  'personal-config': 'personal-config'
+};
+
+function toggleMenu(menuId) {
+  const section = document.querySelector(`.nav-section[data-menu="${menuId}"]`);
+  const subnav = document.querySelector(`.sidebar-subnav[data-subnav="${menuId}"]`);
+  if (!section || !subnav) return;
+  section.classList.toggle('collapsed');
+  subnav.classList.toggle('collapsed');
+}
+
+function expandMenu(menuId) {
+  const section = document.querySelector(`.nav-section[data-menu="${menuId}"]`);
+  const subnav = document.querySelector(`.sidebar-subnav[data-subnav="${menuId}"]`);
+  if (section) section.classList.remove('collapsed');
+  if (subnav) subnav.classList.remove('collapsed');
+}
+
+function switchPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-section').forEach(n => n.classList.remove('active'));
+  const targetPage = document.getElementById('page-' + pageId);
+  if (targetPage) targetPage.classList.add('active');
+  const menuId = pageToMenu[pageId];
+  if (menuId) {
+    expandMenu(menuId);
+    const activeSection = document.querySelector(`.nav-section[data-menu="${menuId}"]`);
+    if (activeSection) activeSection.classList.add('active');
+  }
+  const activeNav = document.querySelector(`.nav-item[onclick*="'${pageId}'"]`);
+  if (activeNav) activeNav.classList.add('active');
+}
+
+function configureMonitors() {
+  const current = Array.from(document.querySelectorAll('.monitor-tag')).map(tag => tag.textContent).join('、');
+  const input = prompt('配置你希望日常观测的指标，用顿号或逗号分隔：', current);
+  if (!input) return;
+  const tags = input.split(/[、,，]/).map(item => item.trim()).filter(Boolean);
+  if (!tags.length) return;
+  document.querySelector('.monitor-tags').innerHTML = tags.map(tag => `<span class="monitor-tag">${tag}</span>`).join('');
+  document.querySelector('.profile-title').textContent = '产品张瑛 · ' + tags.slice(0, 2).join('与') + '监测';
+}
+
+function switchRole(el, role) {
+  document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Quick filter toggles
+document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.parentElement.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.role-switcher .role-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.parentElement.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Search bar interaction
+document.querySelector('.topbar-search input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && this.value.trim()) {
+    switchPage('special-analysis');
+  }
+});
+</script>
+
+</body>
+</html>
